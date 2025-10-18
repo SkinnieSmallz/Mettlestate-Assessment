@@ -26,7 +26,7 @@ export const FAQ: React.FC = () => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-black">
+    <section id="faq" className="py-20 px-4 bg-black">
       <div className="max-w-3xl mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
