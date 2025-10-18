@@ -1,7 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onRulesClick: () => void;
+  onRegistrationsClick: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onRulesClick, onRegistrationsClick }) => {
   const handleLogoClick = () => {
     window.open('https://mettlestate.com', '_blank', 'noopener,noreferrer');
   };
@@ -9,7 +14,7 @@ export const Header: React.FC = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      const headerOffset = 80; // Height of fixed header
+      const headerOffset = 80;
       const elementPosition = element.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -23,8 +28,8 @@ export const Header: React.FC = () => {
   const navItems = [
     { label: 'Event Details', onClick: () => scrollToSection('event-details') },
     { label: 'Leaderboard', onClick: () => scrollToSection('leaderboard') },
-    { label: 'Rules', onClick: () => scrollToSection('rules') },
-    { label: 'Registrations', onClick: () => scrollToSection('registrations') },
+    { label: 'Rules', onClick: onRulesClick },
+    { label: 'Registrations', onClick: onRegistrationsClick },
     { label: 'FAQs', onClick: () => scrollToSection('faq') },
   ];
 
@@ -37,7 +42,6 @@ export const Header: React.FC = () => {
     >
       <div className="px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo - Left Side */}
           <button
             onClick={handleLogoClick}
             className="hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
@@ -50,7 +54,6 @@ export const Header: React.FC = () => {
             />
           </button>
 
-          {/* Navigation - Right Side - Desktop */}
           <nav className="hidden lg:flex items-center gap-8">
             {navItems.map((item, index) => (
               <button
@@ -64,7 +67,6 @@ export const Header: React.FC = () => {
             ))}
           </nav>
 
-          {/* Mobile Menu Button */}
           <button
             className="lg:hidden text-white p-2 hover:bg-gray-800 rounded transition-colors"
             onClick={() => {
@@ -81,7 +83,6 @@ export const Header: React.FC = () => {
           </button>
         </div>
 
-        {/* Mobile Menu */}
         <div id="mobile-menu" className="hidden lg:hidden mt-4 pb-4">
           <div className="flex flex-col gap-4">
             {navItems.map((item, index) => (
