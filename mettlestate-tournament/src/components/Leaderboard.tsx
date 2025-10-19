@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Crown } from 'lucide-react';
 
 interface User {
   id: number;
@@ -24,10 +25,9 @@ export const Leaderboard: React.FC = () => {
         
         console.log('Fetching leaderboard data...');
         
-        // Increased loading time to see animations
         const [response] = await Promise.all([
           fetch('https://jsonplaceholder.typicode.com/users'),
-          new Promise(resolve => setTimeout(resolve, 5000)) // 5 seconds
+          new Promise(resolve => setTimeout(resolve, 3000))
         ]);
         
         if (!response.ok) {
@@ -37,7 +37,6 @@ export const Leaderboard: React.FC = () => {
         const users: User[] = await response.json();
         console.log('Fetched users:', users);
         
-        // Create leaderboard entries with random points
         const entries: LeaderboardEntry[] = users
           .slice(0, 10)
           .map(user => ({
@@ -73,6 +72,20 @@ export const Leaderboard: React.FC = () => {
     return `#${index + 1}`;
   };
 
+  const getProfileImage = (index: number) => {
+    if (index === 0) return '/player1.jpg';
+    if (index === 1) return '/player2.jpg';
+    if (index === 2) return '/player3.jpg';
+    return null;
+  };
+
+  const getBorderColor = (index: number) => {
+    if (index === 0) return 'border-yellow-400';
+    if (index === 1) return 'border-gray-400';
+    if (index === 2) return 'border-orange-500';
+    return 'border-gray-600';
+  };
+
   console.log('Render state:', { loading, error, leaderboardLength: leaderboard.length });
 
   return (
@@ -97,7 +110,6 @@ export const Leaderboard: React.FC = () => {
               transition={{ duration: 0.5 }}
               className="flex flex-col justify-center items-center h-64"
             >
-              {/* Animated Spinner with Glow */}
               <div className="relative">
                 <motion.div
                   animate={{ rotate: 360 }}
@@ -107,7 +119,6 @@ export const Leaderboard: React.FC = () => {
                   <div className="w-20 h-20 border-4 border-gray-700 border-t-red-500 rounded-full"></div>
                 </motion.div>
                 
-                {/* Pulsing Glow Effect */}
                 <motion.div
                   animate={{ 
                     scale: [1, 1.3, 1],
@@ -118,7 +129,6 @@ export const Leaderboard: React.FC = () => {
                 />
               </div>
               
-              {/* Loading Text with Fade */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -128,7 +138,6 @@ export const Leaderboard: React.FC = () => {
                 Loading leaderboard
               </motion.p>
               
-              {/* Animated Dots */}
               <div className="flex gap-3">
                 {[0, 1, 2].map((index) => (
                   <motion.div
@@ -148,7 +157,6 @@ export const Leaderboard: React.FC = () => {
                 ))}
               </div>
               
-              {/* Progress Bar */}
               <div className="w-64 h-1 bg-gray-800 rounded-full mt-8 overflow-hidden">
                 <motion.div
                   initial={{ x: "-100%" }}
@@ -220,7 +228,7 @@ export const Leaderboard: React.FC = () => {
                   initial={{ opacity: 0, x: -100, scale: 0.8 }}
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   transition={{ 
-                    delay: index * 0.15, // Slower stagger (150ms between each)
+                    delay: index * 0.15,
                     type: "spring",
                     stiffness: 80,
                     damping: 12
@@ -234,7 +242,6 @@ export const Leaderboard: React.FC = () => {
                     index < 3 ? 'shadow-2xl scale-105 border-2 border-yellow-500/50 ring-2 ring-yellow-500/20' : 'shadow-lg'
                   } cursor-pointer transition-shadow hover:shadow-2xl relative overflow-hidden`}
                 >
-                  {/* Shine effect for top 3 */}
                   {index < 3 && (
                     <motion.div
                       animate={{
@@ -251,23 +258,94 @@ export const Leaderboard: React.FC = () => {
                   )}
                   
                   <div className="flex items-center gap-5 relative z-10">
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ 
-                        delay: index * 0.15 + 0.3, 
-                        type: "spring",
-                        stiffness: 150,
-                        damping: 10
-                      }}
-                      whileHover={{ 
-                        rotate: [0, -10, 10, -10, 0],
-                        transition: { duration: 0.5 }
-                      }}
-                      className="text-4xl font-bold w-16 text-center"
-                    >
-                      {getRankEmoji(index)}
-                    </motion.div>
+                    {/* Profile Image with Crown for Top 3 */}
+                    {index < 3 && getProfileImage(index) ? (
+                      <div className="relative">
+                        {/* Crown for First Place */}
+                        {index === 0 && (
+                          <motion.div
+                            animate={{
+                              y: [0, -5, 0],
+                              rotate: [-5, 5, -5],
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut"
+                            }}
+                            className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-20"
+                          >
+                            <Crown className="w-8 h-8 text-yellow-400 fill-yellow-400" />
+                            <motion.div
+                              animate={{
+                                scale: [1, 1.2, 1],
+                                opacity: [0.5, 1, 0.5]
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                              }}
+                              className="absolute inset-0 w-8 h-8 bg-yellow-400 rounded-full blur-md -z-10"
+                            />
+                          </motion.div>
+                        )}
+                        
+                        {/* Profile Image */}
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ 
+                            delay: index * 0.15 + 0.3, 
+                            type: "spring",
+                            stiffness: 150,
+                            damping: 10
+                          }}
+                          className={`relative w-16 h-16 rounded-full border-4 ${getBorderColor(index)} overflow-hidden shadow-xl`}
+                        >
+                          <img 
+                            src={getProfileImage(index)!}
+                            alt={entry.username}
+                            className="w-full h-full object-cover"
+                          />
+                          {/* Glow effect */}
+                          <motion.div
+                            animate={{
+                              opacity: [0.3, 0.6, 0.3]
+                            }}
+                            transition={{
+                              duration: 2,
+                              repeat: Infinity,
+                              ease: "easeInOut"
+                            }}
+                            className={`absolute inset-0 ${
+                              index === 0 ? 'bg-yellow-400/30' :
+                              index === 1 ? 'bg-gray-400/30' :
+                              'bg-orange-500/30'
+                            } blur-sm`}
+                          />
+                        </motion.div>
+                      </div>
+                    ) : (
+                      <motion.div
+                        initial={{ scale: 0, rotate: -180 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ 
+                          delay: index * 0.15 + 0.3, 
+                          type: "spring",
+                          stiffness: 150,
+                          damping: 10
+                        }}
+                        whileHover={{ 
+                          rotate: [0, -10, 10, -10, 0],
+                          transition: { duration: 0.5 }
+                        }}
+                        className="text-4xl font-bold w-16 text-center"
+                      >
+                        {getRankEmoji(index)}
+                      </motion.div>
+                    )}
+                    
                     <div>
                       <motion.p
                         initial={{ opacity: 0, y: -15 }}
