@@ -355,14 +355,6 @@ export const Leaderboard: React.FC = () => {
                       >
                         {entry.username}
                       </motion.p>
-                      <motion.p
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.15 + 0.5, duration: 0.4 }}
-                        className="text-sm text-gray-300"
-                      >
-                        {entry.name}
-                      </motion.p>
                     </div>
                   </div>
                   <div className="text-right relative z-10">
