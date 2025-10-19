@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
+import { CountdownTimer } from './components/CountdownTimer';
+import { RegistrationCounter } from './components/RegistrationCounter';
 import { EventDetails } from './components/EventDetails';
 import { Leaderboard } from './components/Leaderboard';
 import { FAQ } from './components/FAQ';
@@ -25,6 +27,8 @@ const App: React.FC = () => {
         onRegistrationsClick={() => setIsRegistrationsOpen(true)}
       />
       <Hero onRegisterClick={handleRegisterClick} />
+      <CountdownTimer />
+      <RegistrationCounter />
       <EventDetails />
       <Leaderboard />
       <FAQ />
