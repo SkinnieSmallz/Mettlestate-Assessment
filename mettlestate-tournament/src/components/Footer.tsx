@@ -1,11 +1,13 @@
 import React from 'react';
-import { Github, Twitter, Youtube } from 'lucide-react';
+import { Twitter, Youtube, Facebook, Twitch, Linkedin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const socialLinks = [
     { icon: Twitter, label: 'Twitter', href: '#' },
+    { icon: Facebook, label: 'Facebook', href: '#' },
+    { icon: Linkedin, label: 'Linkedin', href: '#' },
     { icon: Youtube, label: 'YouTube', href: '#' },
-    { icon: Github, label: 'GitHub', href: '#' },
+    { icon: Twitch, label: 'Twitch', href: '#' },
   ];
 
   const handleLogoClick = () => {
