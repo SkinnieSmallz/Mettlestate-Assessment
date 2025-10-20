@@ -27,8 +27,8 @@ interface RegistrationProviderProps {
 }
 
 export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({ children }) => {
-  const [registrationCount, setRegistrationCount] = useState(87);
-
+  const [registrationCount, setRegistrationCount] = useState(parseInt(localStorage.getItem('rCount') ?? '87'));
+  
   const incrementRegistration = () => {
     setRegistrationCount(prev => prev + 1);
   };

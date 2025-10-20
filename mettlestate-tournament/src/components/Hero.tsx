@@ -67,7 +67,6 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick }) => {
       }}
     >
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/90" />
-      
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
         <motion.h1
           initial={{ y: 30, opacity: 0 }}

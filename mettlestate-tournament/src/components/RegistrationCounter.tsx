@@ -9,6 +9,10 @@ export const RegistrationCounter: React.FC = () => {
   const percentage = (registrationCount / maxRegistrations) * 100;
   const spotsLeft = maxRegistrations - registrationCount;
 
+  function GetRegistrationCount(){
+    localStorage.setItem('rCount', registrationCount.toString())
+    return parseInt(localStorage.getItem('rCount') ?? '0')
+  }
   return (
     <section className="py-12 px-4 bg-black">
       <div className="max-w-4xl mx-auto">
@@ -28,7 +32,7 @@ export const RegistrationCounter: React.FC = () => {
                   transition={{ duration: 0.5 }}
                   className="text-5xl font-bold"
                 >
-                  {registrationCount}
+                  {GetRegistrationCount()}
                 </motion.div>
               </div>
             </div>

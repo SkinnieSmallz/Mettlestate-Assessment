@@ -28,8 +28,8 @@ export const Header: React.FC<HeaderProps> = ({ onRulesClick, onRegistrationsCli
   const navItems = [
     { label: 'Event Details', onClick: () => scrollToSection('event-details') },
     { label: 'Leaderboard', onClick: () => scrollToSection('leaderboard') },
-    { label: 'Rules', onClick: onRulesClick },
     { label: 'Registrations', onClick: onRegistrationsClick },
+    { label: 'Rules', onClick: onRulesClick },
     { label: 'FAQs', onClick: () => scrollToSection('faq') },
   ];
 
@@ -44,13 +44,17 @@ export const Header: React.FC<HeaderProps> = ({ onRulesClick, onRegistrationsCli
         <div className="flex items-center justify-between">
           <button
             onClick={handleLogoClick}
-            className="hover:opacity-80 transition-opacity focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
+            className="group focus:outline-none focus:ring-2 focus:ring-red-500 rounded"
             aria-label="Visit Mettlestate website"
           >
             <img 
               src="/mettlestate-logo.png" 
               alt="Mettlestate" 
-              className="h-10"
+              className="h-10 transition-all duration-300 ease-out
+                        group-hover:scale-110 
+                        group-hover:drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]
+                        group-hover:brightness-110
+                        group-active:scale-95"
             />
           </button>
 

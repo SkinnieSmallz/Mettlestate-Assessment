@@ -9,7 +9,7 @@ import { useRegistration } from '../context/RegistrationContext';
 const registrationSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   gamerTag: z.string().min(3, 'Gamer tag must be at least 3 characters').max(20, 'Gamer tag must be less than 20 characters'),
-  email: z.string().email('Please enter a valid email address'),
+  email: z.email('Please enter a valid email address'),
   favoriteGame: z.string().min(2, 'Please enter your favorite game'),
 });
 
