@@ -4,8 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import type { FAQItem } from '../types';
 import { logger } from '../utils/logger';
 
-export const FAQ: React.FC = () => {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
 
   const faqs: FAQItem[] = [
     {
@@ -26,6 +25,9 @@ export const FAQ: React.FC = () => {
     },
   ];
 
+  export const FAQ: React.FC = () => {
+    const [openIndex, setOpenIndex] = useState<number | null>(null);
+
   useEffect(() => {
     logger.debug('FAQ component mounted', {
       component: 'FAQ',
@@ -38,7 +40,7 @@ export const FAQ: React.FC = () => {
         openIndex
       });
     };
-  }, []);
+  }, [openIndex]);
 
   useEffect(() => {
     try {
@@ -138,7 +140,7 @@ export const FAQ: React.FC = () => {
         } : String(error)
       });
     }
-  }, [faqs]);
+  }, []);
 
   const handleKeyDown = useCallback((
     event: React.KeyboardEvent,
@@ -165,7 +167,7 @@ export const FAQ: React.FC = () => {
         error: error instanceof Error ? error.message : String(error)
       });
     }
-  }, [handleToggle, faqs]);
+  }, [handleToggle]);
 
   useEffect(() => {
     if (openIndex !== null) {
@@ -189,7 +191,7 @@ export const FAQ: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-bold text-center mb-16"
+          className="text-4xl md:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent"
         >
           Frequently Asked Questions
         </motion.h2>

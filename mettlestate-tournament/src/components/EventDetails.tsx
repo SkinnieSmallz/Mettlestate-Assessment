@@ -9,7 +9,6 @@ interface EventDetail {
   value: string;
 }
 
-export const EventDetails: React.FC = () => {
   const details: EventDetail[] = [
     { icon: Calendar, label: 'Date & Time', value: 'August 10, 2025 at 6PM SAST' },
     { icon: MapPin, label: 'Location', value: 'Online - Streamed live on Twitch' },
@@ -17,6 +16,7 @@ export const EventDetails: React.FC = () => {
     { icon: Target, label: 'Format', value: 'Round Robin, Double Elimination' },
   ];
 
+  export const EventDetails: React.FC = () => {
   useEffect(() => {
     logger.debug('EventDetails component mounted', {
       component: 'EventDetails',
@@ -104,7 +104,7 @@ export const EventDetails: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-5xl font-bold text-center mb-16"
+          className="text-4xl md:text-5xl font-bold text-center mb-16 bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 bg-clip-text text-transparent"
         >
           Event Details
         </motion.h2>
