@@ -6,6 +6,16 @@ A modern, responsive landing page for the **Legends of Victory: Battle Royale Cu
 
 **[View Live Site](https://mettlestatecom-battle-royale-n0npqnyor.vercel.app/)**
 
+## 🎥 Video Walkthrough
+
+Watch a full walkthrough of the project features and functionality:
+
+[![Watch Video Walkthrough](https://cdn.loom.com/sessions/thumbnails/f002d90e70494d4f874d8883138e1e7f-with-play.gif)](https://www.loom.com/share/f002d90e70494d4f874d8883138e1e7f?sid=9aad427a-17b7-4a02-9556-5ceabcf97eb6)
+
+**[▶️ Watch on Loom](https://www.loom.com/share/f002d90e70494d4f874d8883138e1e7f?sid=9aad427a-17b7-4a02-9556-5ceabcf97eb6)**
+
+---
+
 ## 🛠️ Tech Stack
 
 React 18 • TypeScript • Vite • Tailwind CSS • Framer Motion
