@@ -8,15 +8,15 @@ interface SocialLink {
   href: string;
 }
 
-  const socialLinks: SocialLink[] = [
-    { icon: Twitter, label: 'Twitter', href: 'https://twitter.com/mettlestate' },
-    { icon: Facebook, label: 'Facebook', href: 'https://facebook.com/mettlestate' },
-    { icon: Linkedin, label: 'LinkedIn', href: 'https://za.linkedin.com/company/mettlestate' },
-    { icon: Youtube, label: 'YouTube', href: 'https://youtube.com/@mettlestate' },
-    { icon: Twitch, label: 'Twitch', href: 'https://twitch.tv/mettlestate' },
-  ];
+const socialLinks: SocialLink[] = [
+  { icon: Twitter, label: 'Twitter', href: 'https://twitter.com/mettlestate' },
+  { icon: Facebook, label: 'Facebook', href: 'https://facebook.com/mettlestate' },
+  { icon: Linkedin, label: 'LinkedIn', href: 'https://za.linkedin.com/company/mettlestate' },
+  { icon: Youtube, label: 'YouTube', href: 'https://youtube.com/@mettlestate' },
+  { icon: Twitch, label: 'Twitch', href: 'https://twitch.tv/mettlestate' },
+];
 
-  export const Footer: React.FC = () => {
+export const Footer: React.FC = () => {
   useEffect(() => {
     logger.debug('Footer component mounted', {
       component: 'Footer',

@@ -4,8 +4,6 @@ import { ChevronDown } from 'lucide-react';
 import type { FAQItem } from '../types';
 import { logger } from '../utils/logger';
 
-
-
   const faqs: FAQItem[] = [
     {
       question: 'How do I register for the tournament?',
