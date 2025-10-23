@@ -1,37 +1,75 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Users, TrendingUp } from 'lucide-react';
+import { logger } from '../utils/logger';
 
-// 1. Define the interface FIRST
 interface RegistrationContextType {
   registrationCount: number;
   incrementRegistration: () => void;
 }
 
-// 2. Create the context
 const RegistrationContext = createContext<RegistrationContextType | undefined>(undefined);
 
-// 3. Create the custom hook
 export const useRegistration = () => {
   const context = useContext(RegistrationContext);
   if (!context) {
+    logger.error('useRegistration hook called outside of RegistrationProvider context');
     throw new Error('useRegistration must be used within a RegistrationProvider');
   }
+  logger.debug('useRegistration hook accessed', { registrationCount: context.registrationCount });
   return context;
 };
 
-// 4. Create the Provider component
 interface RegistrationProviderProps {
   children: ReactNode;
 }
 
 export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({ children }) => {
-  const [registrationCount, setRegistrationCount] = useState(parseInt(localStorage.getItem('rCount') ?? '87'));
+  const storedCount = localStorage.getItem('rCount');
+  const initialCount = storedCount ? parseInt(storedCount) : 87;
+  
+  logger.info('RegistrationProvider initialized', {
+    storedCount,
+    initialCount,
+    source: storedCount ? 'localStorage' : 'default'
+  });
+
+  const [registrationCount, setRegistrationCount] = useState(initialCount);
   
   const incrementRegistration = () => {
-    setRegistrationCount(prev => prev + 1);
+    logger.info('Registration increment initiated', { 
+      currentCount: registrationCount,
+      nextCount: registrationCount + 1
+    });
+    
+    setRegistrationCount(prev => {
+      const newCount = prev + 1;
+      logger.debug('Registration count updated', { 
+        previousCount: prev, 
+        newCount 
+      });
+      return newCount;
+    });
   };
+
+  useEffect(() => {
+    localStorage.setItem('rCount', registrationCount.toString());
+    logger.info('Registration count changed and saved to localStorage', { 
+      registrationCount,
+      maxRegistrations: 128,
+      spotsRemaining: 128 - registrationCount,
+      percentageFilled: ((registrationCount / 128) * 100).toFixed(1)
+    });
+  }, [registrationCount]);
+
+  useEffect(() => {
+    return () => {
+      logger.debug('RegistrationProvider unmounting', { 
+        finalCount: registrationCount 
+      });
+    };
+  }, [registrationCount]);
 
   return (
     <RegistrationContext.Provider value={{ registrationCount, incrementRegistration }}>
@@ -40,19 +78,36 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({ chil
   );
 };
 
-// 5. Your RegistrationCounter component
 export const RegistrationCounter: React.FC = () => {
   const { registrationCount } = useRegistration();
   const maxRegistrations = 128;
   const percentage = (registrationCount / maxRegistrations) * 100;
   const spotsLeft = maxRegistrations - registrationCount;
 
+  useEffect(() => {
+    logger.debug('RegistrationCounter rendered', {
+      registrationCount,
+      maxRegistrations,
+      percentage: percentage.toFixed(1),
+      spotsLeft
+    });
+  }, [registrationCount, percentage, spotsLeft]);
+
+  useEffect(() => {
+    if (spotsLeft < 20) {
+      logger.warn('Registration spots critically low', {
+        spotsLeft,
+        registrationCount,
+        percentageFilled: percentage.toFixed(1)
+      });
+    }
+  }, [spotsLeft, registrationCount, percentage]);
+
   return (
     <section className="py-12 px-4 bg-black">
       <div className="max-w-4xl mx-auto">
         <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-2xl p-8 border border-gray-700">
           <div className="flex flex-col md:flex-row items-center justify-between gap-8">
-            {/* Registration Count */}
             <div className="flex items-center gap-6">
               <div className="bg-red-600/20 p-4 rounded-full">
                 <Users className="w-8 h-8 text-red-500" />
@@ -71,7 +126,6 @@ export const RegistrationCounter: React.FC = () => {
               </div>
             </div>
 
-            {/* Progress Bar */}
             <div className="flex-1 w-full md:w-auto">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-sm text-gray-400">Registration Progress</span>
@@ -88,7 +142,6 @@ export const RegistrationCounter: React.FC = () => {
               <p className="text-xs text-gray-500 mt-2">{maxRegistrations} maximum participants</p>
             </div>
 
-            {/* Spots Left */}
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-orange-500" />
@@ -108,7 +161,6 @@ export const RegistrationCounter: React.FC = () => {
             </div>
           </div>
 
-          {/* Alert when spots are low */}
           {spotsLeft < 20 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}

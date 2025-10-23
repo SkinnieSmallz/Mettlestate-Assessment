@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
-import { RegistrationCounter } from './components/RegistrationCounter';
+import { RegistrationProvider, RegistrationCounter } from './context/RegistrationContext';
 import { EventDetails } from './components/EventDetails';
 import { Leaderboard } from './components/Leaderboard';
 import { FAQ } from './components/FAQ';
@@ -20,34 +20,36 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Header 
-        onRulesClick={() => setIsRulesOpen(true)}
-        onRegistrationsClick={() => setIsRegistrationsOpen(true)}
-      />
-      <Hero onRegisterClick={handleRegisterClick} />
-      <RegistrationCounter />
-      <EventDetails />
-      <Leaderboard />
-      <FAQ />
-      <Footer />
-      
-      <RegistrationForm
-        isOpen={isRegistrationOpen}
-        onClose={() => setIsRegistrationOpen(false)}
-      />
-      
-      <RulesModal
-        isOpen={isRulesOpen}
-        onClose={() => setIsRulesOpen(false)}
-      />
-      
-      <RegistrationsModal
-        isOpen={isRegistrationsOpen}
-        onClose={() => setIsRegistrationsOpen(false)}
-        onRegisterClick={handleRegisterClick}
-      />
-    </div>
+    <RegistrationProvider>
+      <div className="min-h-screen bg-black text-white">
+        <Header 
+          onRulesClick={() => setIsRulesOpen(true)}
+          onRegistrationsClick={() => setIsRegistrationsOpen(true)}
+        />
+        <Hero onRegisterClick={handleRegisterClick} />
+        <RegistrationCounter />
+        <EventDetails />
+        <Leaderboard />
+        <FAQ />
+        <Footer />
+        
+        <RegistrationForm
+          isOpen={isRegistrationOpen}
+          onClose={() => setIsRegistrationOpen(false)}
+        />
+        
+        <RulesModal
+          isOpen={isRulesOpen}
+          onClose={() => setIsRulesOpen(false)}
+        />
+        
+        <RegistrationsModal
+          isOpen={isRegistrationsOpen}
+          onClose={() => setIsRegistrationsOpen(false)}
+          onRegisterClick={handleRegisterClick}
+        />
+      </div>
+    </RegistrationProvider>
   );
 };
 

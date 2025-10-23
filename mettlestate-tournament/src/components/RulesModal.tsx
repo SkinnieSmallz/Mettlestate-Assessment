@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Shield, Users, Trophy, Clock } from 'lucide-react';
+import { logger } from '../utils/logger';
 
 interface RulesModalProps {
   isOpen: boolean;
@@ -31,6 +32,39 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
     },
   ];
 
+  useEffect(() => {
+    if (isOpen) {
+      logger.info('RulesModal opened', {
+        timestamp: new Date().toISOString(),
+        rulesCount: rules.length
+      });
+    }
+  }, [isOpen]);
+
+  const handleClose = () => {
+    logger.info('RulesModal closed by user', {
+      timestamp: new Date().toISOString(),
+      closeMethod: 'button'
+    });
+    onClose();
+  };
+
+  const handleBackdropClick = () => {
+    logger.info('RulesModal closed by user', {
+      timestamp: new Date().toISOString(),
+      closeMethod: 'backdrop'
+    });
+    onClose();
+  };
+
+  useEffect(() => {
+    logger.debug('RulesModal component mounted');
+
+    return () => {
+      logger.debug('RulesModal component unmounted');
+    };
+  }, []);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -39,7 +73,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={handleBackdropClick}
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
           />
           
@@ -51,7 +85,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
           >
             <div className="bg-gray-900 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-gray-700 relative">
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
                 type="button"
               >

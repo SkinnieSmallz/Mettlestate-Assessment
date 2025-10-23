@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { logger } from '../utils/logger';
 
 interface HeroProps {
   onRegisterClick: () => void;
@@ -21,31 +22,135 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick }) => {
     seconds: 0,
   });
 
-  // Tournament date: August 10, 2025 at 6PM SAST
   const tournamentDate = new Date('2025-10-24T18:00:00+02:00').getTime();
 
   useEffect(() => {
-    const calculateTimeLeft = () => {
-      const now = new Date().getTime();
-      const difference = tournamentDate - now;
+    logger.debug('Hero component mounted', {
+      component: 'Hero',
+      tournamentDate: new Date(tournamentDate).toISOString()
+    });
 
-      if (difference > 0) {
-        setTimeLeft({
-          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((difference % (1000 * 60)) / 1000),
+    return () => {
+      logger.debug('Hero component unmounted', {
+        component: 'Hero'
+      });
+    };
+  }, []);
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      try {
+        const now = new Date().getTime();
+        const difference = tournamentDate - now;
+
+        if (difference > 0) {
+          const newTimeLeft = {
+            days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+            hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+            minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+            seconds: Math.floor((difference % (1000 * 60)) / 1000),
+          };
+          
+          setTimeLeft(newTimeLeft);
+        } else {
+          setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          
+          logger.info('Tournament countdown completed', {
+            component: 'Hero',
+            tournamentDate: new Date(tournamentDate).toISOString(),
+            currentTime: new Date().toISOString()
+          });
+        }
+      } catch (error) {
+        logger.error('Error calculating countdown time', {
+          component: 'Hero',
+          error: error instanceof Error ? {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+          } : String(error),
+          tournamentDate: new Date(tournamentDate).toISOString()
         });
-      } else {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       }
     };
 
-    calculateTimeLeft();
+    try {
+      calculateTimeLeft();
+      logger.info('Countdown timer initialized', {
+        component: 'Hero',
+        tournamentDate: new Date(tournamentDate).toISOString(),
+        initialTimeLeft: timeLeft
+      });
+    } catch (error) {
+      logger.error('Error initializing countdown timer', {
+        component: 'Hero',
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+
     const timer = setInterval(calculateTimeLeft, 1000);
 
-    return () => clearInterval(timer);
-  }, []);
+    return () => {
+      clearInterval(timer);
+      logger.debug('Countdown timer interval cleared', {
+        component: 'Hero'
+      });
+    };
+  }, [tournamentDate]);
+
+  useEffect(() => {
+    const totalHours = timeLeft.days * 24 + timeLeft.hours;
+    
+    if (totalHours === 24 && timeLeft.minutes === 0 && timeLeft.seconds <= 1) {
+      logger.info('Tournament starts in 24 hours', {
+        component: 'Hero',
+        timeLeft
+      });
+    } else if (totalHours === 1 && timeLeft.minutes === 0 && timeLeft.seconds <= 1) {
+      logger.info('Tournament starts in 1 hour', {
+        component: 'Hero',
+        timeLeft
+      });
+    } else if (timeLeft.days === 0 && timeLeft.hours === 0 && timeLeft.minutes === 0 && timeLeft.seconds === 0) {
+      logger.info('Tournament is starting now', {
+        component: 'Hero',
+        tournamentDate: new Date(tournamentDate).toISOString()
+      });
+    }
+  }, [timeLeft, tournamentDate]);
+
+  const handleRegisterClick = () => {
+    try {
+      logger.info('Register button clicked from Hero', {
+        component: 'Hero',
+        action: 'register_click',
+        timeLeft,
+        tournamentDate: new Date(tournamentDate).toISOString(),
+        timestamp: new Date().toISOString()
+      });
+      
+      onRegisterClick();
+    } catch (error) {
+      logger.error('Error handling register button click', {
+        component: 'Hero',
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : String(error)
+      });
+      
+      try {
+        onRegisterClick();
+      } catch (callbackError) {
+        logger.error('Error in onRegisterClick callback', {
+          component: 'Hero',
+          error: callbackError instanceof Error ? callbackError.message : String(callbackError)
+        });
+      }
+    }
+  };
 
   const timeUnits = [
     { label: 'Days', value: timeLeft.days },
@@ -86,7 +191,6 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick }) => {
           Compete for glory. Only one can win.
         </motion.p>
 
-        {/* Countdown Timer */}
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -117,7 +221,6 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick }) => {
                   </div>
                 </div>
                 
-                {/* Glow effect */}
                 <motion.div
                   animate={{
                     opacity: [0.3, 0.6, 0.3],
@@ -144,7 +247,7 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick }) => {
           transition={{ delay: 1.3, duration: 0.8 }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={onRegisterClick}
+          onClick={handleRegisterClick}
           className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-bold py-4 px-12 rounded-full text-lg shadow-2xl transition-all"
         >
           Register Now

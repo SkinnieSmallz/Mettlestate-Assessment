@@ -1,16 +1,41 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle } from 'lucide-react';
+import { X, CheckCircle, AlertCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useRegistration } from '../context/RegistrationContext';
+import { logger } from '../utils/logger';
 
 const registrationSchema = z.object({
-  fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  gamerTag: z.string().min(3, 'Gamer tag must be at least 3 characters').max(20, 'Gamer tag must be less than 20 characters'),
-  email: z.email('Please enter a valid email address'),
-  favoriteGame: z.string().min(2, 'Please enter your favorite game'),
+  fullName: z
+    .string()
+    .min(2, 'Full name must be at least 2 characters')
+    .max(100, 'Full name must be less than 100 characters')
+    .refine(name => /^[a-zA-Z\s'-]+$/.test(name), {
+      message: 'Name can only contain letters, spaces, hyphens and apostrophes'
+    }),
+  
+  gamerTag: z
+    .string()
+    .min(3, 'Gamer tag must be at least 3 characters')
+    .max(20, 'Gamer tag must be less than 20 characters')
+    .refine(tag => /^[a-zA-Z0-9_-]+$/.test(tag), {
+      message: 'Gamer tag can only contain letters, numbers, underscores and hyphens'
+    }),
+  
+  email: z
+    .string()
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address')
+    .refine(email => email.indexOf('@') > 0, {
+      message: 'Please enter a valid email address'
+    }),
+  
+  favoriteGame: z
+    .string()
+    .min(2, 'Please enter your favorite game')
+    .max(100, 'Game title is too long'),
 });
 
 type RegistrationFormData = z.infer<typeof registrationSchema>;
@@ -23,6 +48,7 @@ interface RegistrationFormProps {
 export const RegistrationForm: React.FC<RegistrationFormProps> = ({ isOpen, onClose }) => {
   const { incrementRegistration } = useRegistration();
   const [showSuccess, setShowSuccess] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
 
   const {
     register,
@@ -33,24 +59,157 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ isOpen, onCl
     resolver: zodResolver(registrationSchema),
   });
 
-  const onSubmit = async (data: RegistrationFormData) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    
-    console.log('Form data:', data);
-    
-    // Increment the registration counter
-    incrementRegistration();
-    
-    // Show success message
-    setShowSuccess(true);
-    
-    // Wait 2 seconds then close
-    setTimeout(() => {
-      setShowSuccess(false);
+  React.useEffect(() => {
+    logger.debug('RegistrationForm component mounted');
+
+    return () => {
+      logger.debug('RegistrationForm component unmounted');
+    };
+  }, []);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      logger.info('RegistrationForm opened', {
+        component: 'RegistrationForm',
+        timestamp: new Date().toISOString()
+      });
+    }
+  }, [isOpen]);
+
+  const handleClose = React.useCallback(() => {
+    try {
+      logger.info('Closing registration form', {
+        component: 'RegistrationForm',
+        action: 'close_button_clicked',
+        formState: {
+          hasErrors: Object.keys(errors).length > 0,
+          isSubmitting,
+          showSuccess
+        }
+      });
+
       reset();
+      
+      setSubmitError(null);
+      
+      setShowSuccess(false);
+
+      logger.debug('Form cleared successfully', {
+        component: 'RegistrationForm'
+      });
+
       onClose();
-    }, 2000);
+    } catch (error) {
+      logger.error('Error closing registration form', {
+        component: 'RegistrationForm',
+        error: error instanceof Error ? error.message : String(error)
+      });
+      onClose();
+    }
+  }, [onClose, reset, errors, isSubmitting, showSuccess]);
+
+  const onSubmit = async (data: RegistrationFormData) => {
+    try {
+      setSubmitError(null);
+      
+      logger.info('Registration attempt started', { 
+        component: 'RegistrationForm',
+        gamerTag: data.gamerTag,
+        emailDomain: data.email.split('@')[1],
+        favoriteGame: data.favoriteGame,
+        timestamp: new Date().toISOString()
+      });
+
+      // API call simulation
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Registration counter incrementation
+      try {
+        incrementRegistration();
+        logger.debug('Registration counter incremented', {
+          component: 'RegistrationForm',
+          gamerTag: data.gamerTag
+        });
+      } catch (contextError) {
+        logger.warn('Failed to increment registration counter', { 
+          component: 'RegistrationForm',
+          error: contextError instanceof Error ? contextError.message : String(contextError),
+          gamerTag: data.gamerTag 
+        });
+      }
+      
+      logger.info('Registration completed successfully', { 
+        component: 'RegistrationForm',
+        gamerTag: data.gamerTag,
+        timestamp: new Date().toISOString()
+      });
+
+      setShowSuccess(true);
+      
+      setTimeout(() => {
+        logger.debug('Auto-closing form after success', {
+          component: 'RegistrationForm',
+          gamerTag: data.gamerTag
+        });
+        setShowSuccess(false);
+        reset();
+        onClose();
+      }, 2000);
+
+    } catch (error) {
+      logger.error('Registration submission failed', {
+        component: 'RegistrationForm',
+        formData: {
+          gamerTag: data.gamerTag,
+          emailDomain: data.email.split('@')[1],
+          favoriteGame: data.favoriteGame,
+        },
+        step: 'form_submission',
+        error: error instanceof Error ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack
+        } : String(error),
+        userAgent: navigator.userAgent,
+        url: window.location.href,
+        timestamp: new Date().toISOString()
+      });
+
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : 'An unexpected error occurred. Please try again.';
+      
+      setSubmitError(errorMessage);
+    }
   };
+
+  React.useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      logger.info('Form validation errors', { 
+        component: 'RegistrationForm',
+        errors: Object.keys(errors).map(key => ({
+          field: key,
+          message: errors[key as keyof RegistrationFormData]?.message
+        })),
+        timestamp: new Date().toISOString()
+      });
+    }
+  }, [errors]);
+
+  const handleDismissError = React.useCallback(() => {
+    logger.debug('User dismissed error message', {
+      component: 'RegistrationForm',
+      errorMessage: submitError
+    });
+    setSubmitError(null);
+  }, [submitError]);
+
+  React.useEffect(() => {
+    return () => {
+      setSubmitError(null);
+      setShowSuccess(false);
+    };
+  }, []);
 
   const formFields = [
     { name: 'fullName', label: 'Full Name', type: 'text', placeholder: 'John Doe' },
@@ -68,7 +227,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ isOpen, onCl
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            onClick={onClose}
+            onClick={handleClose}
             className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
           />
           
@@ -122,9 +281,10 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ isOpen, onCl
                     <motion.button
                       whileHover={{ scale: 1.1, rotate: 90 }}
                       whileTap={{ scale: 0.9 }}
-                      onClick={onClose}
+                      onClick={handleClose}
                       className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors z-10"
                       type="button"
+                      aria-label="Close registration form"
                     >
                       <X className="w-6 h-6" />
                     </motion.button>
@@ -137,8 +297,32 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ isOpen, onCl
                     >
                       Register Now
                     </motion.h2>
+
+                    <AnimatePresence>
+                      {submitError && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="mb-4 p-4 bg-red-500/10 border border-red-500/50 rounded-lg flex items-start gap-3 relative z-10"
+                        >
+                          <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1">
+                            <p className="text-red-500 text-sm font-medium">Registration Failed</p>
+                            <p className="text-red-400 text-sm mt-1">{submitError}</p>
+                          </div>
+                          <button
+                            onClick={handleDismissError}
+                            className="text-red-400 hover:text-red-300"
+                            aria-label="Dismiss error"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                     
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 relative z-10">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 relative z-10" noValidate>
                       {formFields.map((field, index) => (
                         <motion.div
                           key={field.name}
@@ -157,14 +341,18 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({ isOpen, onCl
                             whileFocus={{ scale: 1.02, borderColor: '#ef4444' }}
                             transition={{ duration: 0.2 }}
                             className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-red-500 text-white placeholder:text-gray-500 transition-all"
+                            aria-invalid={!!errors[field.name as keyof RegistrationFormData]}
+                            aria-describedby={errors[field.name as keyof RegistrationFormData] ? `${field.name}-error` : undefined}
                           />
                           <AnimatePresence>
                             {errors[field.name as keyof RegistrationFormData] && (
                               <motion.p
+                                id={`${field.name}-error`}
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
                                 className="text-red-500 text-sm mt-1"
+                                role="alert"
                               >
                                 {errors[field.name as keyof RegistrationFormData]?.message}
                               </motion.p>
