@@ -11,6 +11,8 @@ interface RegistrationContextType {
 
 const RegistrationContext = createContext<RegistrationContextType | undefined>(undefined);
 
+// NOTE: Could be split into separate files (context/hook, provider, UI) to satisfy Fast Refresh rule
+// eslint-disable-next-line react-refresh/only-export-components
 export const useRegistration = () => {
   const context = useContext(RegistrationContext);
   if (!context) {
@@ -38,7 +40,7 @@ export const RegistrationProvider: React.FC<RegistrationProviderProps> = ({ chil
   const [registrationCount, setRegistrationCount] = useState(initialCount);
   
   const incrementRegistration = () => {
-    logger.info('Registration increment initiated', { 
+    logger.info('Registration increment initiated', {
       currentCount: registrationCount,
       nextCount: registrationCount + 1
     });
