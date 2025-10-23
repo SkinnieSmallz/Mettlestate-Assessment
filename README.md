@@ -17,6 +17,7 @@ React 18 • TypeScript • Vite • Tailwind CSS • Framer Motion
 - Interactive forms with validation
 - Animated modals and components
 - Real-time leaderboard integration
+- Component Testing with Vitest & React Testing Library
 
 ## 📦 Quick Start
 
