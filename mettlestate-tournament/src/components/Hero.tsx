@@ -35,7 +35,7 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick }) => {
         component: 'Hero'
       });
     };
-  }, []);
+  }, [tournamentDate]);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
@@ -97,7 +97,7 @@ export const Hero: React.FC<HeroProps> = ({ onRegisterClick }) => {
         component: 'Hero'
       });
     };
-  }, [tournamentDate]);
+  }, [timeLeft, tournamentDate]);
 
   useEffect(() => {
     const totalHours = timeLeft.days * 24 + timeLeft.hours;

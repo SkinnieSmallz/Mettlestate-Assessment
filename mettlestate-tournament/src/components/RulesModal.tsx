@@ -39,7 +39,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
         rulesCount: rules.length
       });
     }
-  }, [isOpen]);
+  }, [isOpen, rules.length]);
 
   const handleClose = () => {
     logger.info('RulesModal closed by user', {

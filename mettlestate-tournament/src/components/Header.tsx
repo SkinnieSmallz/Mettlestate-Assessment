@@ -27,7 +27,7 @@ export const Header: React.FC<HeaderProps> = ({ onRulesClick, onRegistrationsCli
         mobileMenuWasOpen: mobileMenuOpen
       });
     };
-  }, []);
+  }, [mobileMenuOpen]);
 
   const handleLogoClick = useCallback(() => {
     try {

@@ -8,7 +8,6 @@ interface SocialLink {
   href: string;
 }
 
-export const Footer: React.FC = () => {
   const socialLinks: SocialLink[] = [
     { icon: Twitter, label: 'Twitter', href: 'https://twitter.com/mettlestate' },
     { icon: Facebook, label: 'Facebook', href: 'https://facebook.com/mettlestate' },
@@ -17,6 +16,7 @@ export const Footer: React.FC = () => {
     { icon: Twitch, label: 'Twitch', href: 'https://twitch.tv/mettlestate' },
   ];
 
+  export const Footer: React.FC = () => {
   useEffect(() => {
     logger.debug('Footer component mounted', {
       component: 'Footer',
